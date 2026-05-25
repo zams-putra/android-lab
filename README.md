@@ -22,4 +22,4 @@ Lab pertama aja sih ini buat uji coba juga, ibarat kalau versi web tuh kalian ba
 - Target SDK: 33 (Android 13)
 - Build Tool: AGP 7.4.2
 ## Link
-[link disini](https://github.com/zams-putra/android-lab/tree/main/RahasiaSidi/hasil/rahasiaSidi_VulnLab.apk)
+[link disini](https://github.com/zams-putra/android-lab/releases/download/v1.0.0/rahasiaSidi_VulnLab.apk)
