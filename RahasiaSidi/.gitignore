@@ -36,5 +36,5 @@ gradle/wrapper/gradle-wrapper.jar
 *.keystore
 
 # APK output
-
+*.apk
 *.aab
