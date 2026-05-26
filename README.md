@@ -1,6 +1,7 @@
 # Android Lab 
 
 ### Disclaimer
+- sebagian disini aku pakai AI, soal nya aku ga terlalu jago ngoding android, dulu pernah tapi cuman beberapa kali dan udah lupa, makanya itu sekarang buat lagi sekalian belajar lagi
 - This app is intentionally vulnerable for educational purposes
 - Do not install on production devices
 - buat berjaga jaga, semua aplikasi disini vuln soalnya
