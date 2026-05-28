@@ -26,7 +26,7 @@ Lab pertama aja sih ini buat uji coba juga, ibarat kalau versi web tuh kalian ba
 [link disini](https://github.com/zams-putra/android-lab/releases/download/lab-1/rahasiaSidi_VulnLab.apk)
 
 
-# 1 - Dark Memories (static + dynamic analysis)
+# 2 - Dark Memories (static + dynamic analysis)
 
 ## Desc 
 Lab kedua, disini udah mulai fetching fetching server nih, vuln nya cuman hardcode secret page aja sih sama intercept network di apk nya also with API KEY to get the flag
