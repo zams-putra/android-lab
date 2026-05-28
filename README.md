@@ -25,6 +25,8 @@ Lab pertama aja sih ini buat uji coba juga, ibarat kalau versi web tuh kalian ba
 ## Link
 [link disini](https://github.com/zams-putra/android-lab/releases/download/lab-1/rahasiaSidi_VulnLab.apk)
 
+[walkthrough](https://youtu.be/4jPIRenFNLc)
+
 
 # 2 - Dark Memories (static + dynamic analysis)
 
@@ -46,3 +48,5 @@ Lab kedua, disini udah mulai fetching fetching server nih, vuln nya cuman hardco
 [Link Android](https://github.com/zams-putra/android-lab/releases/download/lab-2/DarkMemories.apk)
 
 [Link zip Backend Server with img](https://github.com/zams-putra/android-lab/releases/download/lab-2/darkmemories-server-build.zip)
+
+[walkthrough](https://youtu.be/2RQRwpAr9UQ)

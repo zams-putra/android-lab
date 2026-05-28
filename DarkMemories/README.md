@@ -373,3 +373,6 @@ Remediation: Jangan return internal info di response
 ```bash
 https://github.com/zams-putra/android-lab
 ```
+
+### walkthrough video disini 
+- https://youtu.be/2RQRwpAr9UQ

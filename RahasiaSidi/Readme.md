@@ -174,3 +174,6 @@ Remediation   : Validasi credentials server-side, jangan simpan di client
 ```bash
 https://github.com/zams-putra/android-lab
 ```
+
+### walkthrough video disini 
+- https://youtu.be/4jPIRenFNLc
