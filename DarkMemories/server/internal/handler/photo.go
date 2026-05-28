@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/zams-putra/android-lab/DarkMemories/server/constants"
 	"github.com/zams-putra/android-lab/DarkMemories/server/internal/model"
 )
-
-const API_KEY = "nasigoreng-ituenak-123"
 
 var photosData = []model.Photo{
 	{
@@ -53,7 +52,7 @@ func ServerIMG(w http.ResponseWriter, r *http.Request) {
 
 func GetPhotos(w http.ResponseWriter, r *http.Request) {
 	apiKey := r.Header.Get("X-API-KEY")
-	if apiKey != API_KEY {
+	if apiKey != constants.API_KEY {
 		http.Error(w, "Unauthorized", 401)
 		return
 	}
@@ -63,5 +62,6 @@ func GetPhotos(w http.ResponseWriter, r *http.Request) {
 		"photos": photosData,
 		"server": "internal-photo-server-v1",
 		"path":   "/var/www/images",
+		"msg":    "We have secret directory right :v ",
 	})
 }
