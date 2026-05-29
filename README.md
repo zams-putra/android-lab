@@ -23,11 +23,15 @@ Lab pertama aja sih ini buat uji coba juga, ibarat kalau versi web tuh kalian ba
 - Target SDK: 33 (Android 13)
 - Build Tool: AGP 7.4.2
 ## Link
-[link disini](https://github.com/zams-putra/android-lab/releases/download/lab-1/rahasiaSidi_VulnLab.apk)
+- [APK](https://github.com/zams-putra/android-lab/releases/download/lab-1/rahasiaSidi_VulnLab.apk)
+- [walkthrough](https://youtu.be/4jPIRenFNLc)
 
-[walkthrough](https://youtu.be/4jPIRenFNLc)
+## Setup
+- download apk nya + install
+- selamat bermain
 
 
+---
 # 2 - Dark Memories (static + dynamic analysis)
 
 ## Desc 
@@ -45,8 +49,19 @@ Lab kedua, disini udah mulai fetching fetching server nih, vuln nya cuman hardco
 - Language   : Go
 
 ## Link
-[Link Android](https://github.com/zams-putra/android-lab/releases/download/lab-2/DarkMemories.apk)
+- [APK](https://github.com/zams-putra/android-lab/releases/download/lab-2/DarkMemories.apk)
+- [Zip](https://github.com/zams-putra/android-lab/releases/download/lab-2/darkmemories-server-build.zip)
+- [walkthrough](https://youtu.be/2RQRwpAr9UQ)
 
-[Link zip Backend Server with img](https://github.com/zams-putra/android-lab/releases/download/lab-2/darkmemories-server-build.zip)
-
-[walkthrough](https://youtu.be/2RQRwpAr9UQ)
+## Setup
+- download zip nya + unzip
+- run binary server nya sesuai OS masing masing
+```ps1
+.\darkmemories_server_win.exe
+```
+```bash
+chmod +x darkmemories_server_linux
+./darkmemories_server_linux
+```
+- download apk nya + install
+- selamat bermain
