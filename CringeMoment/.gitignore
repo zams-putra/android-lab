@@ -1,0 +1,31 @@
+# ni git ignore ai generated yak
+
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Local config (JANGAN pernah commit, isinya path SDK lokal kamu)
+local.properties
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Native build (relevan buat VaultGuard/CringeMoment karena ada CMake/NDK)
+.cxx/
+*.so
+*.o
+
+# Keystore (kalau nanti sign release APK, JANGAN commit ini)
+*.jks
+*.keystore
+
+# Captures & logs
+captures/
+.externalNativeBuild/
+
+# APK/AAB output (jangan commit binary hasil build)
+*.apk
+*.aab
