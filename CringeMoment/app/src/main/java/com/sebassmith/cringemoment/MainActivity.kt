@@ -1,5 +1,6 @@
 package com.sebassmith.cringemoment
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -32,9 +33,11 @@ class MainActivity : AppCompatActivity() {
             val secret = VaultNative.decodeSecret()
 
             if (etPin.text.toString() == hardcodedPin) {
-                tvResult.text = secret
+                val intent = Intent(this, MomentsActivity::class.java)
+                intent.putExtra("secret_moment", secret)
+                startActivity(intent)
             } else {
-                tvResult.text = "PIN salah, vault masih terkunci"
+                tvResult.text = "PIN salah, gausah perlu tau moment crinj ku."
             }
         }
     }

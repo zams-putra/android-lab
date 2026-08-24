@@ -20,7 +20,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+<!--        tambahan bre -->
         <activity android:name=".MomentsActivity" android:exported="false"/>
+        <activity android:name=".MomentDetailActivity" android:exported="false"/>
     </application>
 
 </manifest>

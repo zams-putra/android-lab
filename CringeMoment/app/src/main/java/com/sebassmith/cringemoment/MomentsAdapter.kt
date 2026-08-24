@@ -1,5 +1,6 @@
 package com.sebassmith.cringemoment
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +28,16 @@ class MomentsAdapter(private val moments: List<Moment>) :
         holder.title.text = moment.title
         holder.desc.text = moment.desc
         holder.img.setImageResource(moment.imageResId)
+
+        // intent ke detail
+        holder.itemView.setOnClickListener {
+            val context = holder.itemView.context
+            val intent = Intent(context, MomentDetailActivity::class.java)
+            intent.putExtra("title", moment.title)
+            intent.putExtra("desc", moment.desc)
+            intent.putExtra("imageResId", moment.imageResId)
+            context.startActivity(intent)
+        }
     }
 
     override fun getItemCount() = moments.size
