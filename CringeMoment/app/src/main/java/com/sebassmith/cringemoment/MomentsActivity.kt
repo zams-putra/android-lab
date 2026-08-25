@@ -14,15 +14,15 @@ class MomentsActivity : AppCompatActivity() {
         rv.layoutManager = LinearLayoutManager(this)
         val secretMoment = intent.getStringExtra("secret_moment")
 
-        val moments = listOf(
+        val moments = mutableListOf(
             // tinggal tambahin datanya
             Moment("BreakDance di depan teman teman", "Hahahahahaha ingatt momenmu saat breakdance secara tiba tiba, gilak crinj bgt bjir", R.drawable.moment1),
             Moment("Duduk keren mengamati orang sekitar", "HAHAHHAHA duduk pose dingin lalu berharap orang lain melihatmu seperti pria dingin berbahaya dan misterius", R.drawable.moment2)
         )
 
-//        if (secretMoment != null) {
-//            moments.add(Moment("Locked Memory", secretMoment, R.drawable.moment_secret))
-//        }
+        if (secretMoment != null) {
+            moments.add(Moment("Get ur flag here", secretMoment, R.drawable.moment_secret))
+        }
 
         rv.adapter = MomentsAdapter(moments)
     }
