@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 //                custom alert cuy hhhhh
                 com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                     .setTitle("Access Denied")
-                    .setMessage("Rooted/emulator environment detected. Vault access blocked.")
+                    .setMessage("HAHAHAHAHAHA gausah kepo dibilang, udahlah ini cuman aku saja yg boleh tau momen crinj nya biar terpendam.")
                     .setPositiveButton("OK", null)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show()

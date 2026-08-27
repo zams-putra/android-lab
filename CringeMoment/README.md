@@ -117,6 +117,7 @@ object RootCheck {
     fun isBlocked(): Boolean = true
 }
 ```
+- tapi disini aku memilih tipe 3, yg gabisa ditembus emulator sama root ataupun non-root hahaha
 
 buat main activity nya di /app/src/main/java/package-nya/MainActivity.kt
 ```java
@@ -136,7 +137,7 @@ class MainActivity : AppCompatActivity() {
 //                custom alert cuy hhhhh
                 com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                     .setTitle("Access Denied")
-                    .setMessage("Rooted/emulator environment detected. Vault access blocked.")
+                    .setMessage("HAHAHAHAHAHA gausah kepo dibilang, udahlah ini cuman aku saja yg boleh tau momen crinj nya biar terpendam.")
                     .setPositiveButton("OK", null)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show()

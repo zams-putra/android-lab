@@ -23,5 +23,5 @@ object RootCheck {
     }
 
 
-    fun isBlocked(): Boolean = isDeviceRooted()
+    fun isBlocked(): Boolean = true
 }
