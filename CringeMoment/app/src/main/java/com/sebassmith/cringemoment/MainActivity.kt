@@ -16,19 +16,20 @@ class MainActivity : AppCompatActivity() {
         val etPin = findViewById<EditText>(R.id.etPin)
         val tvResult = findViewById<TextView>(R.id.tvResult)
         val btnUnlock = findViewById<Button>(R.id.btnUnlock)
-        val hardcodedPin = "7331"
+        val hardcodedPin = "6969"
+
 
         btnUnlock.setOnClickListener {
-//            if (RootCheck.isDeviceRooted()) {
-////                custom alert cuy hhhhh
-//                com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-//                    .setTitle("Access Denied")
-//                    .setMessage("Rooted device detected. Vault access blocked.")
-//                    .setPositiveButton("OK", null)
-//                    .setIcon(android.R.drawable.ic_dialog_alert)
-//                    .show()
-//                return@setOnClickListener
-//            }
+            if (RootCheck.isBlocked()) {
+//                custom alert cuy hhhhh
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setTitle("Access Denied")
+                    .setMessage("Rooted/emulator environment detected. Vault access blocked.")
+                    .setPositiveButton("OK", null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show()
+                return@setOnClickListener
+            }
 
             val secret = VaultNative.decodeSecret()
 

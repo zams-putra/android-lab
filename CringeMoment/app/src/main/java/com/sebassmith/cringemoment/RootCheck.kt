@@ -21,4 +21,7 @@ object RootCheck {
         }
         return Build.TAGS != null && Build.TAGS.contains("test-keys")
     }
+
+
+    fun isBlocked(): Boolean = isDeviceRooted()
 }

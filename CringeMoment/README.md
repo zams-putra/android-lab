@@ -11,13 +11,14 @@
 - C++ standard: C++ 17
 ```
 
+
+- tipe 1:
+
+jadi disini tuh aplikasinya root detected, kalau hp nya root dia gabisa masuk lah
+nah kalau hp nya ga root, ya masukin pin langsung bisa masuk dan dapat flag
+
 buat root check, di /app/src/main/java/package-nya/RootCheck.kt
-```kt
-package com.sebassmith.cringemoment
-
-import android.os.Build
-import java.io.File
-
+```java
 object RootCheck {
     fun isDeviceRooted(): Boolean {
         val paths = arrayOf(
@@ -36,20 +37,89 @@ object RootCheck {
         }
         return Build.TAGS != null && Build.TAGS.contains("test-keys")
     }
+
+
+    fun isBlocked(): Boolean = isDeviceRooted() 
+}
+```
+- tipe 2:
+atau gini deh kalau misal mau block emulator dan juga root device 
+```java
+object RootCheck {
+    fun isDeviceRooted(): Boolean {
+        val paths = arrayOf(
+            "/system/app/Superuser.apk",
+            "/sbin/su",
+            "/system/bin/su",
+            "/system/xbin/su",
+            "/data/local/xbin/su",
+            "/data/local/bin/su",
+            "/system/sd/xbin/su",
+            "/system/bin/failsafe/su",
+            "/data/local/su"
+        )
+        for (path in paths) {
+            if (File(path).exists()) return true
+        }
+        return Build.TAGS != null && Build.TAGS.contains("test-keys")
+    }
+
+    fun isEmulator(): Boolean {
+        return Build.FINGERPRINT.contains("generic")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu")
+                || Build.PRODUCT.contains("sdk")
+                || Build.PRODUCT.contains("emulator")
+    }
+
+    fun isBlocked(): Boolean = isDeviceRooted() || isEmulator()
+}
+```
+- tipe 3 :
+nah cuman kalau begitu cara dapetin flag nya ya device nya gabole root, dan gabole emulator, jadi ya real device asli yg non-root nanti baru dapet flag kalau tau pinnya
+atau skenario lain nih, bener bener ngeblock semua dan harus bypass nya pake frida
+
+
+```java
+object RootCheck {
+    fun isDeviceRooted(): Boolean {
+        val paths = arrayOf(
+            "/system/app/Superuser.apk",
+            "/sbin/su",
+            "/system/bin/su",
+            "/system/xbin/su",
+            "/data/local/xbin/su",
+            "/data/local/bin/su",
+            "/system/sd/xbin/su",
+            "/system/bin/failsafe/su",
+            "/data/local/su"
+        )
+        for (path in paths) {
+            if (File(path).exists()) return true
+        }
+        return Build.TAGS != null && Build.TAGS.contains("test-keys")
+    }
+
+    fun isEmulator(): Boolean {
+        return Build.FINGERPRINT.contains("generic")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu")
+                || Build.PRODUCT.contains("sdk")
+                || Build.PRODUCT.contains("emulator")
+    }
+
+    fun isBlocked(): Boolean = true
 }
 ```
 
 buat main activity nya di /app/src/main/java/package-nya/MainActivity.kt
-```kt
-package com.sebassmith.cringemoment
-
-import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-
+```java
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,132 +128,66 @@ class MainActivity : AppCompatActivity() {
         val etPin = findViewById<EditText>(R.id.etPin)
         val tvResult = findViewById<TextView>(R.id.tvResult)
         val btnUnlock = findViewById<Button>(R.id.btnUnlock)
-        val hardcodedPin = "7331"
+        val hardcodedPin = "6969"
+
 
         btnUnlock.setOnClickListener {
-            if (RootCheck.isDeviceRooted()) {
-                Toast.makeText(this, "Rooted device, akses ditolak", Toast.LENGTH_SHORT).show()
+            if (RootCheck.isBlocked()) {
+//                custom alert cuy hhhhh
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setTitle("Access Denied")
+                    .setMessage("Rooted/emulator environment detected. Vault access blocked.")
+                    .setPositiveButton("OK", null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show()
                 return@setOnClickListener
             }
 
             val secret = VaultNative.decodeSecret()
 
             if (etPin.text.toString() == hardcodedPin) {
-                tvResult.text = secret
+                val intent = Intent(this, MomentsActivity::class.java)
+                intent.putExtra("secret_moment", secret)
+                startActivity(intent)
             } else {
-                tvResult.text = "PIN salah, vault masih terkunci"
+                tvResult.text = "PIN salah, gausah perlu tau moment crinj ku."
             }
         }
     }
 }
-```
-buat Vault Native nya di /app/src/main/java/package-nya/VaultNative.kt
-```kt
-package com.sebassmith.cringemoment
-
-object VaultNative {
-    init {
-        System.loadLibrary("cringemoment")
-    }
-    external fun decodeSecret(): String
-}
-```
-
-buat cpp file di app/src/main/cpp/native-lib.cpp
-```cpp
-#include <jni.h>
-#include <string>
-
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_sebassmith_vaultguard_VaultNative_decodeSecret(JNIEnv *env, jobject /* this */) {
-    // ganti isi array ini sesuai flag asli kamu, di-XOR pakai key 0x13
-    unsigned char enc[] = {
-            0x15,0x77,0x76,0x74,0x36,0x64,0x66,0x77,0x73,0x77,
-            0x0
-    };
-    std::string out;
-    for (unsigned char c : enc) {
-        if (c == 0x0) break;
-        out += (char)(c ^ 0x13);
-    }
-    return env->NewStringUTF(out.c_str());
-}
-```
-
-
-activity_main.xml nya , app/src/main/res/layout/activity_main.xml
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="32dp"
-    android:gravity="center">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="CringeMoment"
-        android:textSize="24sp"
-        android:layout_marginBottom="32dp"/>
-
-    <EditText
-        android:id="@+id/etPin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter PIN"
-        android:inputType="numberPassword"
-        android:layout_marginBottom="16dp"/>
-
-    <Button
-        android:id="@+id/btnUnlock"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Unlock Kalo Bisa"
-        android:layout_marginBottom="16dp"/>
-
-    <TextView
-        android:id="@+id/tvResult"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:gravity="center"/>
-
-</LinearLayout>
 ```
 
 
 
 ### vuln [AI generated kek sebelumnya]
 ```bash
-### 1. Hardcoded API Key
-Severity  : Critical
-Location  : ApiClient.kt
-Evidence  : API_KEY = "nasigoreng-ituenak-123"
-Impact    : Attacker bisa akses semua endpoint tanpa install app
-Remediation: Jangan simpan API key di client, gunakan auth server-side
+### 1. Hardcoded PIN in Client-Side Code
+Severity   : Critical
+Location   : MainActivity.kt
+Evidence   : hardcodedPin = "6969"
+Impact     : PIN bisa langsung dibaca via static analysis (JADX), gak perlu bruteforce sama sekali
+Remediation: Validasi PIN harus di server-side, jangan pernah simpan credential apapun di client
 
-### 2. Hardcoded Secret Endpoint
-Severity  : High
-Location  : ApiClient.kt
-Evidence  : SECRET_ENDPOINT = "/s3cr3t_n4sg0r_g0r3ng"
-Impact    : Hidden endpoint ketemu via static analysis
-Remediation: Endpoint sensitive tidak boleh ada di client-side code
+### 2. Client-Side Root/Emulator Detection (Bypassable via Frida)
+Severity   : Medium
+Location   : RootCheck.kt
+Evidence   : isBlocked() cuma ngecek path su, build tags, dan fingerprint/model/hardware string
+Impact     : Attacker bisa hook isBlocked() runtime pakai Frida, paksa return false, tanpa perlu device beneran non-rooted
+Remediation: Root/emulator detection gabisa jadi satu-satunya lapis proteksi, kombinasikan dengan server-side attestation (Play Integrity API), dan jangan andalkan client buat nentuin trust level device
 
-### 3. Cleartext HTTP Traffic
-Severity  : High
-Location  : ApiClient.kt → BASE_URL
-Evidence  : http:// bukan https://
-Impact    : Traffic dapat di-intercept via MITM
-Remediation: Gunakan HTTPS, implement SSL pinning
+### 3. Sensitive Logic Executed Before Authorization Check
+Severity   : High
+Location   : MainActivity.kt -> btnUnlock listener
+Evidence   : VaultNative.decodeSecret() dipanggil sebelum validasi PIN selesai
+Impact     : Native call yang decode secret tetep jalan walau PIN belum tervalidasi, attacker bisa nyolong hasilnya via native hook tanpa pernah tau PIN yang benar
+Remediation: Urutan eksekusi harus authorization check dulu baru compute data sensitif, idealnya secret gak pernah di-compute di client sama sekali, fetch dari server setelah auth berhasil
 
-### 4. Sensitive Data in API Response
-Severity  : Medium
-Location  : GET /photos response
-Evidence  : "server": "internal-photo-server-v1", "path": "/var/www/images"
-Impact    : Internal server info ter-expose
-Remediation: Jangan return internal info di response
+### 4. Weak Obfuscation on Native Secret (XOR Single-Byte Key)
+Severity   : Medium
+Location   : native-lib.cpp
+Evidence   : secret cuma di-XOR pakai key 1 byte (0x13)
+Impact     : Kalau attacker sempet dapetin binary .so-nya, key 1 byte gampang di-bruteforce (cuma 256 kemungkinan) tanpa perlu Frida sama sekali
+Remediation: Jangan simpan secret apapun di native code, obfuscation cuma nambah effort reversing, bukan security beneran, secret sensitif harus di server bukan di-embed di binary
 ```
 
 
@@ -193,4 +197,4 @@ https://github.com/zams-putra/android-lab
 ```
 
 ### walkthrough video disini 
-- https://youtu.be/4jPIRenFNLc
+- 
