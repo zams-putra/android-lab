@@ -17,7 +17,8 @@ class MomentsActivity : AppCompatActivity() {
         val moments = mutableListOf(
             // tinggal tambahin datanya
             Moment("BreakDance di depan teman teman", "Hahahahahaha ingatt momenmu saat breakdance secara tiba tiba, gilak crinj bgt bjir", R.drawable.moment1),
-            Moment("Duduk keren mengamati orang sekitar", "HAHAHHAHA duduk pose dingin lalu berharap orang lain melihatmu seperti pria dingin berbahaya dan misterius", R.drawable.moment2)
+            Moment("Duduk keren mengamati orang sekitar", "HAHAHHAHA duduk pose dingin lalu berharap orang lain melihatmu seperti pria dingin berbahaya dan misterius", R.drawable.moment2),
+            Moment("Posting Story", "UDAHLAH INI GAUSAH DITANYA BANYAK BGT YG CRINJJJJJJJJJJJ", R.drawable.moment3)
         )
 
         if (secretMoment != null) {
