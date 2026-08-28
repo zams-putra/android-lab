@@ -17,7 +17,7 @@
    -> tekan Unlock -> VaultNative.decodeSecret() jalan -> PIN cocok -> masuk ke MomentsActivity
    -> flag muncul rapi di dalam "Locked Memory" card, sesuai flow normal
 
-4. Bonus - Native Hook (biar gausah masukin pin)
+4. Bonus - Native Hook (biar gausah masuk intent2, langsung decode secret)
    -> karena decodeSecret() dipanggil SEBELUM PIN sempet dicek (bug urutan eksekusi)
    -> hook langsung ke native function-nya (Interceptor.attach onLeave)
    -> flag ketarik walau PIN dikosongin/asal, TANPA perlu baca hardcodedPin dari JADX sama sekali
@@ -783,4 +783,4 @@ Spawned `com.sebassmith.cringemoment`. Resuming main thread!
 
 
 ### walkthrough video disini 
-- 
+- https://youtu.be/JCv59jorClI

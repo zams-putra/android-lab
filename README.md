@@ -89,7 +89,7 @@ Lab ketiga, disini dynamic analysis with frida, dia kayak abused fungsi2 di dale
 
 ## Link
 - [APK](https://github.com/zams-putra/android-lab/releases/download/lab-3/CringeMoment.apk)
-- [walkthrough](https://youtu.be/2RQRwpAr9UQ)
+- [walkthrough](https://youtu.be/JCv59jorClI)
 
 ## Setup
 - download apk nya + install
