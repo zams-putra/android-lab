@@ -10,14 +10,14 @@
    -> kesimpulan: PIN udah di tangan, tapi app tetep gak bisa dibuka tanpa bypass isBlocked()
 
 2. DYNAMIC (Frida) - bypass block check
-   -> hook RootCheck.isBlocked(), paksa return false
-   -> sekarang tombol "Unlock Vault" bisa diproses
+   -> hook RootCheck.isBlocked(), paksa return false pake script false_method.js
+   -> sekarang tombol "Unlock Vault" bisa diproses, ketik aja 6969 di pin dah bisa masuk
 
 3. MASUKIN PIN hasil static analysis (6969)
    -> tekan Unlock -> VaultNative.decodeSecret() jalan -> PIN cocok -> masuk ke MomentsActivity
    -> flag muncul rapi di dalam "Locked Memory" card, sesuai flow normal
 
-4. (BONUS, worth disebut di artikel) - kamu sebenarnya gak butuh tau PIN sama sekali
+4. Bonus - Native Hook (biar gausah masukin pin)
    -> karena decodeSecret() dipanggil SEBELUM PIN sempet dicek (bug urutan eksekusi)
    -> hook langsung ke native function-nya (Interceptor.attach onLeave)
    -> flag ketarik walau PIN dikosongin/asal, TANPA perlu baca hardcodedPin dari JADX sama sekali
@@ -181,6 +181,15 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
+- btw buat generate flag aku pakai ini 
+```py
+flag = "FLAG{0169145710bb4e301fed39201dd1a64c}"
+key = 0x13
+
+enc = [hex(ord(c) ^ key) for c in flag]
+print(", ".join(enc) + ", 0x0")
+```
+nah outputnya nanti taruh di native-lib.cpp
 - lalu untuk file cpp nya, app/src/main/cpp/native-lib.cpp
 ```cpp
 #include <jni.h>
@@ -251,8 +260,8 @@ Remediation: Jangan simpan secret apapun di native code, obfuscation cuma nambah
 https://github.com/zams-putra/android-lab
 ```
 
-## Attacking (my ori writeup)
-- download dulu apk nya 
+## Attacking 
+- download dulu apk nya disini: https://github.com/zams-putra/android-lab/releases/download/lab-3/CringeMoment.apk
 - install di emulator 
 ```ps1
 emulator -list-avds
@@ -641,113 +650,136 @@ isinya begini
 ```ps1
 frida-ps -U
 ```
-- terus run ini 
+- first kita coba enum enum dulu pakai script js
+```js
+Java.perform(function () {
+    setTimeout(function () {
+        Java.enumerateLoadedClasses({
+            onMatch: function (className) {
+                if (className.indexOf("cringemoment") !== -1) {
+                    console.log(className);
+                }
+            },
+            onComplete: function () {
+                console.log("[*] enum classes done");
+            }
+        });
+    }, 2000);
+});
+```
+- first kita enum class 
 ```ps1
-frida -U -f com.sebassmith.cringemoment -l .\exploit.js
-```
-- lalu di androidnya masukin pin, sesuai static analysis yaitu: 6969
-- udah deh tinggal masuk ke intent flag nya 
+frida -U -f com.sebassmith.cringemoment -l .\enum.js
 
 
-## Attacking (AI generated writeup)
+Spawned `com.sebassmith.cringemoment`. Resuming main thread!
+[Android Emulator 5554::com.sebassmith.cringemoment ]-> com.sebassmith.cringemoment.MomentsActivity
+com.sebassmith.cringemoment.MainActivity
+com.sebassmith.cringemoment.MainActivity$$ExternalSyntheticLambda0
+com.sebassmith.cringemoment.VaultNative
+com.sebassmith.cringemoment.RootCheck
+com.sebassmith.cringemoment.R$layout
+com.sebassmith.cringemoment.R$id
+[*] enum classes done
+```
+- yang kedua kita enum Methods
+```ps1
+frida -U -f com.sebassmith.cringemoment -l .\enum2.js
 
-### Static Analysis (Recon)
-- install dulu apk nya ke emulator/device kayak biasa
-```bash
-adb install CringeMoment.apk
+Spawned `com.sebassmith.cringemoment`. Resuming main thread!
+[Android Emulator 5554::com.sebassmith.cringemoment ]-> [*] total methods found: 2
+public final boolean com.sebassmith.cringemoment.RootCheck.isBlocked()
+public final boolean com.sebassmith.cringemoment.RootCheck.isDeviceRooted()
 ```
-- lempar apk nya ke JADX, cek "com.sebassmith.cringemoment"
-- buka "MainActivity.kt", ketemu ini
-```kt
-val hardcodedPin = "6969"
-```
-- udah dapet PIN-nya dari static analysis doang, tapi belum tentu langsung kepake, soalnya ada "RootCheck.isBlocked()" yang jalan duluan sebelum PIN sempet dicek
-- buka "RootCheck.kt", ketemu
-```kt
-fun isBlocked(): Boolean = true
-```
-- nah ini kuncinya, "isBlocked()" di-hardcode "true" tanpa syarat apapun, jadi mau device kamu rooted, emulator, atau real device sekalipun, tetep ke-block semua, popup "Access Denied" bakal selalu muncul kalau tombol Unlock ditekan
-- artinya PIN yang udah ketemu tadi **gak akan pernah kepake** sampe block-nya di-bypass dulu
-- lanjut cek "VaultNative.kt", ketemu ada native call
-```kt
-external fun decodeSecret(): String
-```
-- ini nandain ada native lib yang perlu diextract, buat liat isinya lebih dalem, kita extract apk nya kayak file zip biasa
-```bash
-unzip CringeMoment.apk -d cringemoment_extracted
-```
-- cek folder lib nya, sesuaikan sama arch emulator/device kamu (di kasusku x86_64)
-```bash
-ls cringemoment_extracted/lib/x86_64/
-```
-- bakal ketemu "libcringemoment.so", coba "strings" buat nyari plaintext flag
-```bash
-strings cringemoment_extracted/lib/x86_64/libcringemoment.so | grep -i flag
-```
-- hasilnya nihil, gak ketemu apa-apa yang keliatan kayak flag, karena secret-nya di-XOR encode di native code, bukan disimpen plaintext
-- kesimpulan recon: **static analysis doang gak cukup**, harus lanjut dynamic analysis buat dua hal — bypass block check, dan baca hasil decode dari native function-nya
-### Dynamic Analysis (Frida)
- 
-- push frida-server ke device/emulator (asumsi udah nyala dari setup sebelumnya, kalau belum cek lagi bagian setup Frida)
-```bash
-adb push frida-server /data/local/tmp/
-adb shell "chmod 755 /data/local/tmp/frida-server"
-adb shell "/data/local/tmp/frida-server &"
-```
-- verifikasi kekonek dari host
-```bash
-frida-ps -U
-```
- 
-- script Frida nya, "hook.js", dua tahap: bypass "isBlocked()" + hook native "decodeSecret()"
+kebetulan emang ku pakai 2 doang sih saat ini, yang tadi ada isEmulator cuman udah ku hapus di RootCheck.kt nya
+
+- nah lanjutannya, kita bikin method rootcheck tadi untuk return false
+soalnya kalau RootCheck nya true ya dia ngedenied, makanya kita abused dia biar return false
+begini aja sih sebenernya 
 ```js
 Java.perform(function () {
     var RootCheck = Java.use("com.sebassmith.cringemoment.RootCheck");
- 
+
     RootCheck.isBlocked.implementation = function () {
         console.log("[*] isBlocked() called, forcing return false");
         return false;
     };
- 
+
     console.log("[*] block check bypass attached");
 });
- 
-function hookNative() {
-    var target = Module.findExportByName("libcringemoment.so",
-        "Java_com_sebassmith_cringemoment_VaultNative_decodeSecret");
-    if (target == null) {
-        setTimeout(hookNative, 500);
-        return;
-    }
-    Interceptor.attach(target, {
-        onLeave: function (retval) {
-            var secret = Java.vm.getEnv().getStringUtfChars(retval, null).readCString();
-            console.log("[+] native decodeSecret() returned: " + secret);
-        }
-    });
-    console.log("[*] native hook attached at " + target);
-}
-setTimeout(hookNative, 1000);
 ```
- 
-- spawn apk nya langsung pakai Frida, biar hook nempel dari awal sebelum native lib sempet ke-load duluan
-```bash
-frida -U -f com.sebassmith.cringemoment -l hook.js --no-pause
+terus run aja
+```ps1
+frida -U -f com.sebassmith.cringemoment -l .\false_method.js
+
+Spawned `com.sebassmith.cringemoment`. Resuming main thread!
+[Android Emulator 5554::com.sebassmith.cringemoment ]-> [*] block check bypass attached
+[*] isBlocked() called, forcing return false
 ```
+udah sih tinggal masukin pin nya, dan langsung bisa intent ke flag
+
+- buat final sih bisa pakai script ini juga dan sama aja sih step selanjutnya
+bedanya yang ini ada log nya sama ada hook ke file .so nya
+```ps1
+frida -U -f com.sebassmith.cringemoment -l .\exploit.js
+```
+gini out nya 
+```ps1
+frida -U -f com.sebassmith.cringemoment -l .\exploit.js
  
-- setelah spawn, popup "Access Denied" udah gak muncul lagi, tombol Unlock baru bisa diproses — sebelumnya, karena "isBlocked()" di-hardcode "true" tanpa syarat, popup ini SELALU muncul apapun device-nya, jadi Frida bypass ini wajib jadi langkah pertama buat kedua jalan di bawah, gak ada cara nyampe titik cek PIN tanpa lewatin ini dulu
-- dari titik ini (block udah ke-bypass), ada 2 cara buat dapetin flag:
-**Jalan 1 - pakai PIN hasil static analysis (tetap butuh Frida buat lewatin block-nya duluan)**
-- Frida bypass "isBlocked()" (wajib, tanpa ini gak akan pernah sampe titik cek PIN)
-- masukin PIN "6969" yang udah ketemu dari JADX tadi, tekan Unlock
-- masuk ke "MomentsActivity", scroll, klik card "Locked Memory"
-- flag muncul di "MomentDetailActivity", sesuai flow normal app
-**Jalan 2 - shortcut lewat native hook (block bypass sama hook native dipasang sekaligus, PIN gak relevan)**
-- Frida bypass "isBlocked()" (sama, wajib duluan)
-- tekan Unlock aja walau PIN dikosongin/asal-asalan
-- karena "decodeSecret()" dipanggil SEBELUM validasi PIN kelar, native call-nya tetep jalan
-- flag udah ketarik ke console Frida dari "onLeave", duluan sebelum sempet ke-filter sama pengecekan PIN di Kotlin
-- kedua jalan sama-sama butuh Frida di awal buat lewatin "isBlocked()", tapi jalan 2 nunjukin kelemahan lebih dalem: begitu block-nya lewat, PIN protection-nya sendiri pun bisa di-skip total kalau attacker fokus ke titik native hook-nya, gak perlu baca PIN dari JADX sama sekali
+[Android Emulator 5554::com.sebassmith.cringemoment ]-> [*] block check bypass attached
+[*] isBlocked() called, forcing return false
+[*] native hook attached at 0x7b1dc727fee0
+```
+- sekarang kita coba buat lanjutin native hooks nya
+disini lanjutan ke file .so, sebenernya udah bisa kita tadi klaim flag
+tapi kali ini lanjutannya ke file .so 
+buat aja file js nya 
+```js
+console.log("[*] script loaded");
+
+Java.perform(function () {
+    console.log("[*] Java.perform started");
+
+    const RootCheck = Java.use(
+        "com.sebassmith.cringemoment.RootCheck"
+    );
+
+    RootCheck.isBlocked.implementation = function () {
+        console.log("[+] RootCheck.isBlocked() -> false");
+        return false;
+    };
+
+    const VaultNative = Java.use(
+        "com.sebassmith.cringemoment.VaultNative"
+    );
+
+    VaultNative.decodeSecret.implementation = function () {
+        console.log("[+] VaultNative.decodeSecret() called");
+
+        const result = this.decodeSecret();
+
+        console.log("[+] secret = " + result);
+
+        return result;
+    };
+
+    console.log("[+] Java hooks installed");
+});
+```
+nanti output begini 
+```ps1
+frida -U -f com.sebassmith.cringemoment -l .\native_hook.js
+
+
+[*] script loaded
+Spawned `com.sebassmith.cringemoment`. Resuming main thread!
+[Android Emulator 5554::com.sebassmith.cringemoment ]-> [*] Java.perform started
+[+] Java hooks installed
+[+] RootCheck.isBlocked() -> false
+[+] VaultNative.decodeSecret() called
+[+] secret = FLAG{0169145710bb4e301fed39201dd1a64c}
+```
 
 
 ### walkthrough video disini 

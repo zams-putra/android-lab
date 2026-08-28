@@ -65,3 +65,32 @@ chmod +x darkmemories_server_linux
 ```
 - download apk nya + install
 - selamat bermain
+
+
+# 3 - Cringe Moment (static + dynamic analysis)
+
+## Desc 
+Lab ketiga, disini dynamic analysis with frida, dia kayak abused fungsi2 di dalemnya gitu yg awalnya true di set jadi false biar bisa masuk
+
+## Tech Stack
+
+### Android
+- Language     : Kotlin
+- Native       : C++17
+- JNI          : Android NDK / JNI
+- Min SDK      : 24 (Android 7.0)
+- Target SDK   : 36
+- Build Tool   : Android Gradle Plugin (AGP) 8.x
+
+### Analysis & Exploitation
+- Static       : JADX
+- Dynamic      : Frida 17.x
+- Runtime      : Android Emulator
+
+## Link
+- [APK](https://github.com/zams-putra/android-lab/releases/download/lab-3/CringeMoment.apk)
+- [walkthrough](https://youtu.be/2RQRwpAr9UQ)
+
+## Setup
+- download apk nya + install
+- selamat bermain
