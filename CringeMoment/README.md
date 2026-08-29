@@ -191,6 +191,8 @@ print(", ".join(enc) + ", 0x0")
 ```
 nah outputnya nanti taruh di native-lib.cpp
 - lalu untuk file cpp nya, app/src/main/cpp/native-lib.cpp
+nah native func ini beda coeg sama function kotlin biasanya, ini gabisa di analisis pake jadx dia outputnya bukan .dex tapi .so
+nah .so ini bisa di analyst pake r2 atau strings lah, jadinya assembly gitu pokoknya
 ```cpp
 #include <jni.h>
 #include <string>
